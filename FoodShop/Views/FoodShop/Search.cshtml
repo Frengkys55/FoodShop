@@ -1,0 +1,181 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Custom";
+}
+
+<div style="margin-top:38.5px;">
+    <div id="pnlSearch" class="w3-display-container" style="height:300px; width:100%;">
+        <div class="w3-card w3-display-middle" style="width:400px;">
+            <header class="w3-container w3-center">
+                <h1>Search food</h1>
+            </header>
+            <div class="w3-container w3-padding">
+                <input id="txtSearchFood" type="text" class="w3-input w3-border w3-round w3-border-black" placeholder="Search food" />
+            </div>
+            <div>
+                <a href="#" class="w3-button w3-margin w3-transparent w3-hover-black w3-round w3-border w3-border-black" onclick="btnSearch_Click()">Search</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="pnlSearchResult" style="display:block; max-width:1366px;" class="w3-content">
+    <div class="w3-ul w3-container">
+        <div id="pnlFoodResult" class="w3-bar-item">
+    </div>
+
+    <div class="w3-container">
+        <button class="w3-button w3-block w3-round w3-border w3-border-black w3-hover-black" onclick="LoadMore_Click()">Load more</button>
+    </div>
+</div>
+
+<script>
+
+    var orderGuid;
+    var userGuid;
+    
+    var currentPage = 1;
+
+    function btnSearch_Click(){
+
+        document.getElementById("pnlFoodResult").innerHTML = "";
+        var searchItem = document.getElementById("txtSearchFood").value;
+        var result = SearchFood(searchItem);
+        if(result.length > 0){
+            document.getElementById("pnlSearchResult").style.display = "block";
+            for(var i = 0; i < result.length; i++){
+                CreateNewButton(result[i]);
+            }
+        }
+
+        currentPage = 0;
+    }
+
+    function LoadMore_Click(){
+        currentPage++;
+
+        document.getElementById("pnlFoodResult").innerHTML = "";
+        var searchItem = document.getElementById("txtSearchFood").value;
+        var result = SearchFood(searchItem, currentPage);
+            if (result.length > 0) {
+                document.getElementById("pnlSearchResult").style.display = "block";
+                for (var i = 0; i < result.length; i++) {
+                    CreateNewButton(result[i]);
+                }
+            }
+            
+    }
+
+    function SearchFood(FoodName, page = 1){
+        var queryString = "?name=" + FoodName;
+        if(page > 0) queryString += "&page=" + page;
+
+        var result = XHRDownloader("GET", "/api/food/search" + queryString);
+        return JSON.parse(result);
+    }
+
+    function CreateNewButton(Food){
+        try{
+                var button = document.createElement("div");
+                button.classList.add("w3-transparent");
+                button.classList.add("w3-round");
+                button.classList.add("w3-border");
+                button.classList.add("w3-border-black");
+
+                var foodContainer = document.createElement("header");
+                foodContainer.classList.add("w3-container");
+
+                var foodHeader = document.createElement("h5");
+                foodHeader.innerText = Food.name;
+
+                foodContainer.appendChild(foodHeader);
+
+                var foodDescriptionContainer = document.createElement("div");
+
+                foodDescriptionContainer.innerHTML = "<p>" + Food.description + "</p>";
+
+                var quantityContainer = document.createElement("div");
+                quantityContainer.classList.add("w3-bar");
+
+                quantityContainer.innerHTML = "<label class=\"w3-bar-item\">Quantity</label>";
+
+                var quantityInput = document.createElement("input");
+                quantityInput.classList.add("w3-bar-item");
+                quantityInput.classList.add("w3-input");
+                quantityInput.classList.add("w3-round");
+                quantityInput.classList.add("w3-border");
+                quantityInput.classList.add("w3-border-black");
+                quantityInput.style.width = "100px";
+                quantityInput.value = 1;
+                quantityInput.id = "txt" + Food.name + "Quantity";
+
+                quantityContainer.appendChild(quantityInput);
+
+                var addItemToOrder = document.createElement("button");
+                addItemToOrder.classList.add("w3-bar-item");
+                addItemToOrder.classList.add("w3-right");
+                addItemToOrder.classList.add("w3-button");
+                addItemToOrder.classList.add("w3-transparent");
+                addItemToOrder.classList.add("w3-border");
+                addItemToOrder.classList.add("w3-round");
+                addItemToOrder.classList.add("w3-border-black");
+                addItemToOrder.classList.add("w3-border-hover-black");
+                addItemToOrder.innerText = "Add to order";
+
+                addItemToOrder.addEventListener("click", function(){AddFoodToOrder(Food);});
+                quantityContainer.appendChild(addItemToOrder);
+
+                foodContainer.appendChild(foodDescriptionContainer);
+                foodContainer.appendChild(quantityContainer);
+
+                button.appendChild(foodContainer);
+
+                document.getElementById("pnlFoodResult").appendChild(button);
+        }
+        catch(e){
+
+        }
+        
+    }
+
+    function AddFoodToOrder(Food){
+        var quantity = document.getElementById("txt" + Food.name + "Quantity").value;
+        var result = XHRDownloader("POST", "/api/order?foodGuid=" + Food.guid + "&orderGuid=" + orderGuid + "&quantity=" + quantity);
+    }
+
+    function OnLoad(){
+        // Try checking from cookie
+
+        try{
+            if(document.cookie.length > 0){
+                orderGuid = GetCookie("orderGuid");
+                userGuid = GetCookie("userGuid");
+                console.log(orderGuid);
+            }
+            else{
+                var result = JSON.parse(XHRDownloader("GET", "/api/order/new"));
+                orderGuid = result.orderGuid;
+                userGuid = result.userGuid;
+
+                document.cookie = "userGuid=" + userGuid;
+                document.cookie = "orderGuid=" + orderGuid;
+            }
+        }
+        catch(e){
+        }
+    }
+
+    function GetCookie(name) {
+        var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        if (match) {
+            return match[2];
+        }
+        else {
+            console.log('--something went wrong---');
+        }
+    }
+    OnLoad();
+</script>

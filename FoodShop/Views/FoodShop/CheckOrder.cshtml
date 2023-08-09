@@ -1,0 +1,44 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Custom";
+}
+
+<div style="w3-content" style="max-width:1366px;">
+    <div id="pnlSearch" class="w3-display-container" style="height:300px; width:100%;">
+        <div class="w3-card w3-display-middle" style="width:400px;">
+            <header class="w3-container w3-center">
+                <h1>Search order</h1>
+            </header>
+            <div class="w3-container w3-padding">
+                <input id="txtSearchOrder" type="text" class="w3-input w3-border w3-round w3-border-black" placeholder="Search food" />
+            </div>
+            <div>
+                <a href="#" class="w3-button w3-margin w3-transparent w3-hover-black w3-round w3-border w3-border-black" onclick="btnSearch_Click()">Search</a>
+            </div>
+            <footer class="w3-container">
+                <span id="lblOrderStatus">ORDER GUID NOT SET</span>
+            </footer>
+        </div>
+    </div>
+</div>
+
+<script>
+    function btnSearch_Click(){
+        var orderGuid = document.getElementById("txtSearchOrder").value;
+
+        try {
+            var result = XHRDownloader("GET", "/api/order/check?id=" + orderGuid);
+            if (result == 1) {
+                document.getElementById("lblOrderStatus").innerHTML = "THIS ORDER HAS BEEN PAID";
+            }
+            else{
+                document.getElementById("lblOrderStatus").innerHTML = "THE USER HAS NOT YET PAID FOR THIS ORDER.";
+            }
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
+</script>

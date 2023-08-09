@@ -1,0 +1,140 @@
+﻿@{
+    Layout = "_Custom";
+}
+
+<div style="margin-top:40px;">
+    <div class="w3-card">
+        <header class="w3-container w3-center">
+            <h1>Orders</h1>
+            <p>Your order, sir</p>
+        </header>
+        <div class="w3-container">
+            <div id="pnlOrderId">
+                Your order ID: <label id="txtOrderId"></label>
+            </div>
+            <ul id="lstOrders" class="w3-ul">
+
+            </ul>
+        </div>
+        <div class="w3-border-top w3-border-black">
+            <div class="w3-row w3-container">
+                <div class="w3-col m3">
+                    Total amount to pay:
+                </div>
+                <div id="pnlTotalAmountToPay" class="w3-rest">
+
+                </div>
+            </div>
+        </div>
+        <div id="pnlPayOrder" class="w3-bar w3-padding">
+            <button class="w3-bar-item w3-button w3-transparent w3-round w3-border w3-border-black w3-hover-black" onclick="ProcedPaymentCompletion_Click()">Proceed to complete payment</button>
+        </div>
+    </div>
+
+    <script>
+        var orderGuid;
+        var userGuid;
+
+        function CheckOrder(orderGuid) {
+            try {
+                var result = XHRDownloader("GET", "/api/order/check?id=" + orderGuid);
+                if (result == 1) {
+                    document.getElementById("pnlPayOrder").innerHTML = "THIS ORDER HAS BEEN PAID";
+                }
+            }
+            catch (e) {
+                console.error(e);
+            }
+        }
+
+        function GetOrders(orderGuid){
+            var orders = JSON.parse(XHRDownloader("GET", "/api/order?id=" + orderGuid));
+            
+            var totalPrice = 0;
+
+            for(var i = 0; i < orders.length; i++){
+                totalPrice += orders[i].price * orders[i].quantity;
+                
+                RenderOrder(orders[i]);
+            }
+            document.getElementById("txtOrderId").innerText = orderGuid;
+            document.getElementById("pnlTotalAmountToPay").innerHTML = "Rp. " + totalPrice;
+        }
+
+        function RenderOrder(Food){
+            var foodList = document.createElement("li");
+
+            var foodContainer = document.createElement("div");
+            foodContainer.classList.add("w3-bar");
+
+            var foodName = document.createElement("label");
+            foodName.classList.add("w3-bar-item");
+            foodName.innerText = Food.name;
+            
+            foodContainer.appendChild(foodName);
+
+            var foodPrice = document.createElement("label");
+            foodPrice.classList.add("w3-bar-item");
+            foodPrice.innerText = "Rp. " + Food.price;
+
+            foodContainer.appendChild(foodPrice);
+
+            var foodQuantity = document.createElement("label");
+            foodQuantity.classList.add("w3-bar-item");
+            foodQuantity.innerText = "x" + Food.quantity;
+
+            foodContainer.appendChild(foodQuantity);
+            
+            var foodTotal = document.createElement("label");
+            foodTotal.classList.add("w3-bar-item");
+            foodTotal.innerText = "= Rp. " + (Food.price * Food.quantity);
+            foodContainer.appendChild(foodTotal);
+
+            foodList.appendChild(foodContainer);
+            document.getElementById("lstOrders").appendChild(foodList);
+        }
+
+        function ProcedPaymentCompletion_Click(){
+            var result = XHRDownloader("POST", "/api/order/completepayment?id=" + orderGuid);
+            if(result == 1){
+                window.location.href = "/";
+            }
+        }
+
+        function OnLoad() {
+            // Try checking from cookie
+
+            try {
+                if (document.cookie.length > 0) {
+                    orderGuid = GetCookie("orderGuid");
+                    userGuid = GetCookie("userGuid");
+                }
+                else {
+                    var result = JSON.parse(XHRDownloader("GET", "/api/order/new"));
+                    orderGuid = result.orderGuid;
+                    userGuid = result.userGuid;
+
+                    document.cookie = "userGuid=" + userGuid;
+                    document.cookie = "orderGuid=" + orderGuid;
+                }
+
+                GetOrders(orderGuid);
+                CheckOrder(orderGuid);
+            }
+            catch (e) {
+            }
+        }
+
+        function GetCookie(name) {
+            var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            if (match) {
+                return match[2];
+            }
+            else {
+                console.log('--something went wrong---');
+            }
+        }
+
+        OnLoad();
+    </script>
+</div>

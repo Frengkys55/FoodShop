@@ -1,0 +1,114 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>FoodShop</title>
+        <link rel="stylesheet" href="/css/w3.css" />
+
+        <script src="js/XHRHelper.js"></script>
+        <script src="js/FoodShop_CodeBehind.js"></script>
+    </head>
+    <body>
+        <div id="navmenu" class="w3-bar w3-top w3-black">
+            <a href="#" class="w3-bar-item w3-button w3-transparent w3-hover-white">Home</a>
+            <a href="/FoodShop/Search" class="w3-bar-item w3-button w3-transparent w3-hover-white">Search</a>
+            <a href="/FoodShop/CheckOrder" class="w3-bar-item w3-button w3-transparent w3-hover-white">Check order</a>
+            <a href="/FoodShop/Orders" class="w3-bar-item w3-button w3-transparent w3-hover-white w3-right">Orders</a>
+        </div>
+        <div class="w3-card" style="margin-top:40px;">
+            <div id="pnlOrder">
+                <div class="w3-row">
+                    Your order id: <label id="lblOrderId"></label>
+                </div>
+                <div class="w3-row">
+                    Your order status: <label id="lblOrderStatus"></label>
+                </div>
+                <div id="pnlNewOrderConfirm" class="w3-bar" style="display:none;">
+                    <div>
+                        I see that your current order has been paid. Do you want to create a new order?
+                    </div>
+                    <button class="w3-bar-item w3-button w3-transparent w3-round w3-border w3-border-black w3-hover-black" onclick="MakeNewOrder_Click()">
+                        Make new order
+                    </button>
+                    <button class="w3-bar-item w3-button w3-transparent w3-round w3-border w3-border-black w3-hover-black" onclick="window.location.href='/FoodShop/CheckOrder';">
+                        Check your old order
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        var orderGuid;
+        var userGuid;
+
+        function CheckOrder(orderGuid){
+            try{
+                var result = XHRDownloader("GET", "/api/order/check?id=" + orderGuid);
+                if(result == 1){
+                    document.getElementById("lblOrderStatus").innerText = "PAID";
+                    document.getElementById("pnlNewOrderConfirm").style.display = "block";
+                }
+            }
+            catch(e){
+                console.error(e);
+            }
+        }
+
+        function MakeNewOrder_Click(){
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i];
+                const eqPos = cookie.indexOf("=");
+                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            }
+
+            window.location.href="/";
+        }
+
+
+        function OnLoad() {
+
+            // Try checking from cookie
+            try {
+                if (document.cookie.length > 0) {
+                    orderGuid = GetCookie("orderGuid");
+                    userGuid = GetCookie("userGuid");
+                }
+                else {
+                    var result = JSON.parse(XHRDownloader("GET", "/api/order/new"));
+                    orderGuid = result.orderGuid;
+                    userGuid = result.userGuid;
+
+                    document.cookie = "userGuid=" + userGuid;
+                    document.cookie = "orderGuid=" + orderGuid;
+                }
+             
+                
+                document.getElementById("lblOrderId").innerText = orderGuid;
+                
+                CheckOrder(orderGuid);
+                GetOrders(orderGuid);
+
+            }
+            catch (e) {
+            }
+        }
+
+        function GetCookie(name) {
+            var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            if (match) {
+                return match[2];
+            }
+            else {
+                console.log('--something went wrong---');
+            }
+        }
+
+        OnLoad();
+        </script>
+    </body>
+</html>

@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FoodShop</title>
+    <link rel="stylesheet" href="~/css/w3.css" />
+    <script src="~/js/XHRHelper.js"></script>
+</head>
+<body>
+    <div id="navmenu" class="w3-bar w3-top w3-black">
+        <a href="/" class="w3-bar-item w3-button w3-transparent w3-hover-white">Home</a>
+        <a href="/FoodShop/Search" class="w3-bar-item w3-button w3-transparent w3-hover-white">Search</a>
+        <a href="/FoodShop/CheckOrder" class="w3-bar-item w3-button w3-transparent w3-hover-white">Check order</a>
+        <a href="/FoodShop/Orders" class="w3-bar-item w3-button w3-transparent w3-hover-white w3-right">Orders</a>
+    </div>
+    <div>
+        <main>
+            @RenderBody()
+        </main>
+    </div>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
