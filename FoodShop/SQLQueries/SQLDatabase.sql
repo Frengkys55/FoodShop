@@ -201,3 +201,118 @@ END;
 GO
 
 -- ADD EXAMPLE FOOD
+IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'FOODDETAILS')
+BEGIN
+	INSERT INTO FOODDETAILS(
+		Guid,
+		Name,
+		Price,
+		Description)
+	VALUES(
+		(SELECT NEWID()),
+		'Avocado',
+		20000,
+		'A fruit that is high in healthy fats and is often used in salads and sandwiches.'
+	)
+	INSERT INTO FOODDETAILS(
+		Guid,
+		Name,
+		Price,
+		Description)
+	VALUES(
+		(SELECT NEWID()),
+		'Salmon',
+		150000,
+		'A fish that is rich in omega-3 fatty acids and is often grilled or baked.'
+	)
+
+	INSERT INTO FOODDETAILS(
+		Guid,
+		Name,
+		Price,
+		Description)
+	VALUES(
+		(SELECT NEWID()),
+		'Quinoa',
+		50000,
+		'A grain that is high in protein and fiber and is often used in salads and bowls.'
+	)
+	INSERT INTO FOODDETAILS(
+		Guid,
+		Name,
+		Price,
+		Description)
+	VALUES(
+		(SELECT NEWID()),
+		'Kale',
+		15000,
+		'A leafy green vegetable that is high in vitamins and minerals and is often used in salads and smoothies.'
+	)
+	INSERT INTO FOODDETAILS(
+		Guid,
+		Name,
+		Price,
+		Description)
+	VALUES(
+		(SELECT NEWID()),
+		'Sweet potatoes',
+		10000,
+		'A root vegetable that is high in fiber and vitamins and is often roasted or mashed.'
+	)
+	INSERT INTO FOODDETAILS(
+		Guid,
+		Name,
+		Price,
+		Description)
+	VALUES(
+		(SELECT NEWID()),
+		'Almonds',
+		70000,
+		'A nut that is high in healthy fats and protein and is often used as a snack or in baking.'
+	)
+	INSERT INTO FOODDETAILS(
+		Guid,
+		Name,
+		Price,
+		Description)
+	VALUES(
+		(SELECT NEWID()),
+		'Greek yogurt',
+		50000,
+		'A dairy product that is high in protein and calcium and is often used as a breakfast food or snack.'
+	)
+	INSERT INTO FOODDETAILS(
+		Guid,
+		Name,
+		Price,
+		Description)
+	VALUES(
+		(SELECT NEWID()),
+		'Spinach',
+		15000,
+		'A leafy green vegetable that is high in vitamins and minerals and is often used in salads and smoothies.'
+	)
+	INSERT INTO FOODDETAILS(
+		Guid,
+		Name,
+		Price,
+		Description)
+	VALUES(
+		(SELECT NEWID()),
+		'Blueberries',
+		30000,
+		'A fruit that is high in antioxidants and fiber and is often used in smoothies or as a snack.'
+	)
+	INSERT INTO FOODDETAILS(
+		Guid,
+		Name,
+		Price,
+		Description)
+	VALUES(
+		(SELECT NEWID()),
+		'Chicken breast',
+		40000,
+		'A lean protein source that can be grilled or baked and used in various dishes such as salads, sandwiches, or stir-fries.'
+	)
+END
+GO
